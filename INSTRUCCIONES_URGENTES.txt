@@ -1,0 +1,8 @@
+1. Descomprima todo el ZIP en una carpeta nueva.
+2. Ejecute INICIAR_APLICACION.bat.
+3. Espere hasta 30 segundos.
+4. El navegador se abrirá solamente cuando el servidor esté funcionando.
+5. Si falla, envíe los archivos servidor.log y diagnostico_inicio.txt.
+
+Acceso:
+gerencia / Rimel2026!

@@ -1,0 +1,89 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://192.168.1.42:8000
+Press CTRL+C to quit
+127.0.0.1 - - [16/Jul/2026 17:41:44] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:46] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:47] "GET /static/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:47] "GET /static/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:47] "GET /static/logo.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:47] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [16/Jul/2026 17:41:47] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:41:48] "POST /login HTTP/1.1" 302 -
+127.0.0.1 - - [16/Jul/2026 17:41:48] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:49] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:41:49] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:41:49] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:41:49] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:41:49] "GET /service-worker.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:41:51] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /tracking HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /static/manifest.json HTTP/1.1" 304 -
+C:\Users\CLIENTE2022\Downloads\Control_Vendedores_RIMEL_V6_RUTAS_CLIENTES_GERENCIA\rimel_v6\app.py:510: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now=datetime.utcnow()
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /api/locations HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:12] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:14] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:17] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:17] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:17] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:17] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:17] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:19] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:34] "GET /history HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:34] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:34] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:34] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:34] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:36] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:38] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:38] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:38] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:38] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:40] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:45] "GET /?seller=Gerson&day=LUNES&date_from=2026-07-16&date_to=2026-07-16 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:45] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:45] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:45] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:45] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:47] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "POST /visits HTTP/1.1" 302 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:57] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:42:59] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:00] "GET /history HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:43:00] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:00] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:00] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:00] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:02] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:33] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [16/Jul/2026 17:43:35] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:36] "POST /login HTTP/1.1" 302 -
+127.0.0.1 - - [16/Jul/2026 17:43:36] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:43:37] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:37] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:37] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:37] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /clients HTTP/1.1" 200 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /static/styles.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:38] "GET /service-worker.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:39] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [16/Jul/2026 17:43:41] "GET /service-worker.js HTTP/1.1" 304 -

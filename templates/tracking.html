@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<div class="topline"><div><h1>Ubicación de vendedores</h1><p class="muted">Muestra la última posición enviada voluntariamente por cada vendedor durante el seguimiento activo.</p></div><span id="updated" class="pill">Actualizando…</span></div>
+<section class="panel"><div id="map" class="live-map"></div></section>
+<section class="panel"><h2>Estado de dispositivos</h2><div class="table-wrap small-table"><table><thead><tr><th>Vendedor</th><th>Estado</th><th>Última actualización</th><th>Precisión</th><th>Velocidad</th><th>Mapa</th></tr></thead><tbody id="locationRows"></tbody></table></div></section>
+{% endblock %}{% block scripts %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynhHd5xN7Yw9h4VxP2M7aIh1Q8qQ=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+const map=L.map('map').setView([-30.905,-55.55],13);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);const markers={};
+function ago(seconds){if(seconds<60)return 'hace '+seconds+' s';if(seconds<3600)return 'hace '+Math.floor(seconds/60)+' min';return 'hace '+Math.floor(seconds/3600)+' h'}
+async function refresh(){const r=await fetch('/api/locations');const data=await r.json();const rows=document.getElementById('locationRows');rows.innerHTML='';let bounds=[];for(const x of data){const tr=document.createElement('tr');if(x.latitude!==undefined){const state=x.online?'<span class="status online">En línea</span>':'<span class="status offline">Sin actualización reciente</span>';tr.innerHTML=`<td><b>${x.seller}</b></td><td>${state}</td><td>${ago(x.age_seconds)}</td><td>${x.accuracy?Math.round(x.accuracy)+' m':'—'}</td><td>${x.speed!=null?Math.round(x.speed*3.6)+' km/h':'—'}</td><td><a class="button secondary" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${x.latitude},${x.longitude}">Abrir</a></td>`;if(!markers[x.seller])markers[x.seller]=L.marker([x.latitude,x.longitude]).addTo(map);else markers[x.seller].setLatLng([x.latitude,x.longitude]);markers[x.seller].bindPopup(`<b>${x.seller}</b><br>${state}<br>${ago(x.age_seconds)}`);bounds.push([x.latitude,x.longitude]);}else{tr.innerHTML=`<td><b>${x.seller}</b></td><td><span class="status offline">Sin datos</span></td><td>—</td><td>—</td><td>—</td><td>—</td>`;}rows.appendChild(tr);}if(bounds.length)map.fitBounds(bounds,{padding:[40,40],maxZoom:15});updated.textContent='Actualizado '+new Date().toLocaleTimeString();}
+refresh();setInterval(refresh,20000);
+</script>{% endblock %}
