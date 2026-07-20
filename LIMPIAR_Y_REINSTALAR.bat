@@ -1,7 +1,7 @@
-@echo off
-chcp 65001 >nul
-cd /d "%~dp0"
-echo Se eliminara solamente el entorno tecnico .venv.
-echo La base de datos rimel.db y sus registros NO se eliminaran.
-if exist .venv rmdir /s /q .venv
-call INICIAR_APLICACION.bat
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+ENV PORT=8000
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 app:app

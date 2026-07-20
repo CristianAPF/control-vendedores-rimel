@@ -1,89 +1,41 @@
-@echo off
-chcp 65001 >nul
-cd /d "%~dp0"
-setlocal EnableExtensions
-set "LOG=diagnostico_inicio.txt"
-echo ===== INICIO %date% %time% ===== > "%LOG%"
-echo Carpeta: %cd% >> "%LOG%"
+# Actualizar GitHub y Render a V6
 
-echo =============================================
-echo   CONTROL DE VENDEDORES RIMEL
-echo =============================================
-echo.
+## 1. Actualizar GitHub
 
-if exist ".venv\Scripts\python.exe" goto INSTALL
+1. Descomprime el ZIP V6.
+2. Entra al repositorio `control-vendedores-rimel`.
+3. Pulsa **Add file** y luego **Upload files**.
+4. Arrastra el contenido de la carpeta `rimel_v6`, no la carpeta completa y no el ZIP.
+5. Confirma el reemplazo de los archivos existentes.
+6. Pulsa **Commit changes**.
 
-where py >nul 2>nul
-if not errorlevel 1 (
-  set "PY=py -3"
-  goto CREATE
-)
-where python >nul 2>nul
-if not errorlevel 1 (
-  set "PY=python"
-  goto CREATE
-)
-goto NOPYTHON
+Deben quedar en la raíz del repositorio, entre otros:
 
-:CREATE
-echo Creando entorno...
-%PY% --version >> "%LOG%" 2>&1
-%PY% -m venv .venv >> "%LOG%" 2>&1
-if errorlevel 1 goto ERROR
+- `app.py`
+- `requirements.txt`
+- `templates/`
+- `static/`
 
-:INSTALL
-echo Verificando componentes...
-".venv\Scripts\python.exe" --version >> "%LOG%" 2>&1
-".venv\Scripts\python.exe" -m pip install -r requirements-local.txt >> "%LOG%" 2>&1
-if errorlevel 1 goto ERROR
+No subas `.venv`, `rimel.db` ni `__pycache__`.
 
-echo Preparando usuarios...
-".venv\Scripts\python.exe" reset_users.py >> "%LOG%" 2>&1
-if errorlevel 1 goto ERROR
+## 2. Actualizar Render
 
-echo Iniciando servidor...
-start "RIMEL SERVIDOR" /min cmd /c ""%cd%\.venv\Scripts\python.exe" "%cd%\app.py" >> "%cd%\servidor.log" 2>&1"
+Render normalmente despliega automáticamente el nuevo commit. Si no lo hace:
 
-echo Esperando que la aplicacion quede disponible...
-for /L %%i in (1,1,30) do (
-  powershell -NoProfile -Command "try { $r=Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/health -TimeoutSec 2; if($r.StatusCode -eq 200){exit 0}else{exit 1} } catch { exit 1 }" >nul 2>nul
-  if not errorlevel 1 goto OPEN
-  timeout /t 1 /nobreak >nul
-)
+1. Entra al servicio `vendedores-rimel`.
+2. Pulsa **Manual Deploy**.
+3. Elige **Deploy latest commit**.
+4. Si continúa apareciendo la versión anterior, usa **Clear build cache & deploy**.
 
-echo.
-echo La aplicacion no pudo iniciar.
-echo Abra servidor.log y diagnostico_inicio.txt para ver el error.
-echo.
-type servidor.log
-pause
-goto END
+No cambies `DATABASE_URL`; es la conexión con la base central que ya contiene la información.
 
-:OPEN
-echo.
-echo Aplicacion iniciada correctamente.
-echo Direccion: http://127.0.0.1:8000/login
-echo.
-start "" http://127.0.0.1:8000/login
-echo Puede cerrar esta ventana. Para detener el servidor, cierre la ventana llamada RIMEL SERVIDOR.
-pause
-goto END
+## 3. Verificar
 
-:NOPYTHON
-echo No se encontro Python 3. >> "%LOG%"
-echo No se encontro Python 3 en este equipo.
-echo Instale Python desde python.org y marque Add Python to PATH.
-pause
-goto END
+Cuando el despliegue muestre **Live**:
 
-:ERROR
-echo ERROR %errorlevel% >> "%LOG%"
-echo.
-echo Ocurrio un error durante la preparacion.
-echo Abra diagnostico_inicio.txt para ver el detalle.
-echo.
-type "%LOG%"
-pause
-
-:END
-endlocal
+1. Abre la URL pública.
+2. Inicia sesión como Gerencia.
+3. Debe aparecer **Clientes y rutas** en el menú.
+4. Optimiza una ruta de prueba.
+5. Ingresa con el vendedor correspondiente y selecciona ese día.
+6. La lista debe aparecer con el orden optimizado guardado.

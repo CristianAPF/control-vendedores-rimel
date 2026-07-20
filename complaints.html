@@ -1,14 +1,1 @@
-{% extends 'base.html' %}
-{% block title %}Modificar cliente · RIMEL{% endblock %}
-{% block content %}
-<div class="topline"><div><h1>Modificar cliente</h1><p class="muted">Solo Gerencia puede cambiar estos datos.</p></div><a class="button secondary" href="/clients">Volver</a></div>
-<section class="panel narrow-panel"><form class="stack-form" method="post">
-<label>Código<input name="code" value="{{client.code}}" required></label>
-<label>Nombre<input name="name" value="{{client.name}}" required></label>
-<label>Dirección<input name="address" value="{{client.address}}" required></label>
-<label>Vendedor<input name="seller" list="sellerList" value="{{client.seller}}" required></label>
-<datalist id="sellerList">{% for s in sellers %}<option value="{{s}}">{% endfor %}</datalist>
-<label>Día<select name="day">{% for d in ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] %}<option {{'selected' if client.day==d}}>{{d}}</option>{% endfor %}</select></label>
-<div class="actions"><button>Guardar cambios</button><a class="button secondary" target="_blank" href="/client/{{client.id}}/map">Ver mapa</a></div>
-</form></section>
-{% endblock %}
+{% extends 'base.html' %}{% block content %}<section class="panel narrow"><h1>Cambiar contraseña</h1><form method="post"><label>Nueva contraseña<input type="password" name="password" minlength="8" required></label><label>Confirmar<input type="password" name="confirm" minlength="8" required></label><button>Guardar</button></form></section>{% endblock %}
