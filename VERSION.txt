@@ -1,0 +1,2 @@
+RIMEL v2026.07.20.6
+Incluye zona horaria America/Montevideo, exportaciones Excel, módulo de quejas ampliado y corrección Leaflet GPS.
