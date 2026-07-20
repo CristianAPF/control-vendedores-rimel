@@ -1,0 +1,15 @@
+ACTUALIZACION COMPLETA RIMEL
+
+1. Abra esta carpeta.
+2. Seleccione TODO su contenido (no la carpeta contenedora).
+3. En GitHub: Add file > Upload files.
+4. Arrastre todos los archivos y carpetas.
+5. Confirme con Commit changes directamente en main.
+6. Render debe desplegar automáticamente. Si no lo hace: Manual Deploy > Deploy latest commit.
+
+NO se incluye rimel.db y NO se modifica DATABASE_URL.
+Los registros permanecen en la base PostgreSQL existente de Render.
+
+Comprobacion posterior:
+https://vendedores-rimel.onrender.com/health
+Debe indicar version 2026.07.20.7 y timezone America/Montevideo.
