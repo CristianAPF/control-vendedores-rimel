@@ -1,0 +1,1 @@
+Subir estos archivos a la RAIZ de GitHub. No contiene rimel.db. No cambia DATABASE_URL. app.py incluye internamente todas las pantallas y estilos para evitar archivos cruzados.
