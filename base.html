@@ -1,4 +1,1 @@
-const CACHE='rimel-v2026-07-20-7';
-self.addEventListener('install',e=>self.skipWaiting());
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method==='GET'){e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request)))}});
+{% extends 'base.html' %}{% block title %}Acceso RIMEL{% endblock %}{% block content %}<section class="login-card"><h1>Ingresar</h1><form method="post"><label>Usuario<input name="username" required autocomplete="username"></label><label>Contraseña<input type="password" name="password" required autocomplete="current-password"></label><button>Ingresar</button></form><p class="muted">La aplicación puede instalarse desde el menú del navegador: “Agregar a pantalla de inicio”.</p></section>{% endblock %}

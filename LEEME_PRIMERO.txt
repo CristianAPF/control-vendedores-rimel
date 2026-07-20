@@ -1,0 +1,13 @@
+PAQUETE RIMEL v2026.07.20.9
+
+1. Descomprime este ZIP.
+2. En GitHub, en la raíz del repositorio, usa Add file > Upload files.
+3. Arrastra TODO el contenido de esta carpeta, no la carpeta contenedora.
+4. Confirma Commit directly to main.
+5. Render hará el despliegue automático.
+
+NO incluye rimel.db ni scripts de limpieza. Conserva la misma DATABASE_URL.
+
+Comprobación:
+https://vendedores-rimel.onrender.com/health
+Debe indicar version 2026.07.20.9 y timezone America/Montevideo.
