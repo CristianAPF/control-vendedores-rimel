@@ -1,14 +1,58 @@
 {% extends 'base.html' %}
-{% block title %}Modificar cliente · RIMEL{% endblock %}
+{% block title %}Clientes y rutas · RIMEL{% endblock %}
 {% block content %}
-<div class="topline"><div><h1>Modificar cliente</h1><p class="muted">Solo Gerencia puede cambiar estos datos.</p></div><a class="button secondary" href="/clients">Volver</a></div>
-<section class="panel narrow-panel"><form class="stack-form" method="post">
-<label>Código<input name="code" value="{{client.code}}" required></label>
-<label>Nombre<input name="name" value="{{client.name}}" required></label>
-<label>Dirección<input name="address" value="{{client.address}}" required></label>
-<label>Vendedor<input name="seller" list="sellerList" value="{{client.seller}}" required></label>
-<datalist id="sellerList">{% for s in sellers %}<option value="{{s}}">{% endfor %}</datalist>
-<label>Día<select name="day">{% for d in ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] %}<option {{'selected' if client.day==d}}>{{d}}</option>{% endfor %}</select></label>
-<div class="actions"><button>Guardar cambios</button><a class="button secondary" target="_blank" href="/client/{{client.id}}/map">Ver mapa</a></div>
-</form></section>
+<div class="topline"><div><h1>Clientes y rutas</h1><p class="muted">Administración exclusiva de Gerencia. Aquí puedes crear, modificar, reasignar, dar de baja y optimizar rutas.</p></div><span class="pill">{{clients|length}} registros</span></div>
+
+<section class="panel">
+  <h2>Agregar cliente</h2>
+  <form class="client-form" method="post" action="/clients/create">
+    <label>Código<input name="code" placeholder="Automático si se deja vacío"></label>
+    <label>Vendedor<input name="seller" list="sellerList" required></label>
+    <label>Día<select name="day" required>{% for d in ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] %}<option>{{d}}</option>{% endfor %}</select></label>
+    <label>Nombre<input name="name" required></label>
+    <label class="wide">Dirección<input name="address" required placeholder="Calle y número, Rivera"></label>
+    <button>Agregar cliente</button>
+  </form>
+  <datalist id="sellerList">{% for s in sellers %}<option value="{{s}}">{% endfor %}</datalist>
+</section>
+
+<section class="panel optimizer-box">
+  <div class="section-head"><div><h2>Optimización del recorrido</h2><p class="muted">La secuencia se guarda en la base central. Desde ese momento, el vendedor verá la ruta ya ordenada al seleccionar su día.</p></div></div>
+  <div class="optimizer-grid">
+    <label>Vendedor<select id="optSeller"><option value="">Seleccionar</option>{% for s in sellers %}<option>{{s}}</option>{% endfor %}</select></label>
+    <label>Día<select id="optDay"><option value="">Seleccionar</option>{% for d in ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] %}<option>{{d}}</option>{% endfor %}</select></label>
+    <label class="wide">Punto de partida<input id="optStart" value="Enrique Tarigo s/n, Rivera, Uruguay"></label>
+    <label>Final<select id="optReturn"><option value="open">Último cliente</option><option value="return">Regresar al origen</option></select></label>
+    <button type="button" id="optimizeBtn">Optimizar y guardar</button>
+  </div>
+  <div class="progress"><span id="optProgress"></span></div>
+  <p id="optStatus" class="muted">Selecciona vendedor y día. La primera geocodificación puede demorar algunos minutos.</p>
+  <div id="optPreview" class="route-preview"></div>
+</section>
+
+<form class="filters" method="get">
+  <select name="seller"><option value="">Todos los vendedores</option>{% for s in sellers %}<option value="{{s}}" {{'selected' if s==selected_seller}}>{{s}}</option>{% endfor %}</select>
+  <select name="day"><option value="">Todos los días</option>{% for d in ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] %}<option value="{{d}}" {{'selected' if d==selected_day}}>{{d}}</option>{% endfor %}</select>
+  <select name="status"><option value="active" {{'selected' if selected_status=='active'}}>Activos</option><option value="inactive" {{'selected' if selected_status=='inactive'}}>Inactivos</option><option value="all" {{'selected' if selected_status=='all'}}>Todos</option></select>
+  <input name="q" value="{{search}}" placeholder="Buscar cliente, código o dirección">
+  <button>Filtrar</button><a class="button secondary" href="/clients">Limpiar</a>
+</form>
+
+<section class="panel"><div class="table-wrap"><table><thead><tr><th>Orden</th><th>Código</th><th>Cliente</th><th>Dirección</th><th>Vendedor</th><th>Día</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+{% for c in clients %}<tr class="{{'inactive-row' if not c.active}}"><td>{{c.optimized_order or c.original_order}}</td><td>{{c.code}}</td><td><b>{{c.name}}</b></td><td>{{c.address}}</td><td>{{c.seller}}</td><td>{{c.day}}</td><td><span class="pill">{{'Activo' if c.active else 'Inactivo'}}</span></td><td><div class="row-actions"><a class="button secondary" href="/clients/{{c.id}}/edit">Modificar</a><a class="button secondary" target="_blank" href="/client/{{c.id}}/map">Mapa</a><form method="post" action="/clients/{{c.id}}/toggle" onsubmit="return confirm('{{'Dar de baja' if c.active else 'Reactivar'}} este cliente?')"><button class="{{'danger' if c.active else ''}}">{{'Dar de baja' if c.active else 'Reactivar'}}</button></form></div></td></tr>
+{% else %}<tr><td colspan="8">No hay clientes para estos filtros.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
+{% block scripts %}
+<script>
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const statusEl=document.getElementById('optStatus'), progressEl=document.getElementById('optProgress'), previewEl=document.getElementById('optPreview');
+function hav(a,b){const R=6371,d2r=Math.PI/180,dLat=(b.latitude-a.latitude)*d2r,dLon=(b.longitude-a.longitude)*d2r;const x=Math.sin(dLat/2)**2+Math.cos(a.latitude*d2r)*Math.cos(b.latitude*d2r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+async function geocode(text){const q=encodeURIComponent(text+', Rivera, Uruguay');const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=uy&accept-language=es&q=${q}`;const r=await fetch(url,{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('Error del servicio de mapas');const data=await r.json();return data.length?{latitude:Number(data[0].lat),longitude:Number(data[0].lon)}:null;}
+function routeDistance(path,start,back){let total=0,prev=start;for(const p of path){total+=hav(prev,p);prev=p;}if(back&&path.length)total+=hav(prev,start);return total;}
+function nearest(points,start){const pending=[...points],path=[];let cur=start;while(pending.length){let bi=0,bd=Infinity;pending.forEach((p,i)=>{const d=hav(cur,p);if(d<bd){bd=d;bi=i;}});cur=pending.splice(bi,1)[0];path.push(cur);}return path;}
+function twoOpt(path,start,back){let best=[...path],bestD=routeDistance(best,start,back),changed=true,passes=0;while(changed&&passes<8){changed=false;passes++;for(let i=0;i<best.length-2;i++){for(let k=i+1;k<best.length-1;k++){const candidate=best.slice(0,i).concat(best.slice(i,k+1).reverse(),best.slice(k+1));const d=routeDistance(candidate,start,back);if(d+0.01<bestD){best=candidate;bestD=d;changed=true;}}}}return {path:best,distance:bestD};}
+async function optimize(){const seller=document.getElementById('optSeller').value,day=document.getElementById('optDay').value,startText=document.getElementById('optStart').value.trim(),back=document.getElementById('optReturn').value==='return';if(!seller||!day||!startText){statusEl.textContent='Completa vendedor, día y punto de partida.';return;}document.getElementById('optimizeBtn').disabled=true;previewEl.innerHTML='';try{statusEl.textContent='Cargando clientes…';const rr=await fetch(`/api/routes/${encodeURIComponent(seller)}/${encodeURIComponent(day)}`);if(!rr.ok)throw new Error('No se pudo cargar la ruta');const clients=await rr.json();if(!clients.length)throw new Error('No hay clientes activos para esa ruta');statusEl.textContent='Localizando punto de partida…';const start=await geocode(startText);if(!start)throw new Error('No se pudo localizar el punto de partida');let located=[],failed=[];for(let i=0;i<clients.length;i++){const c=clients[i];progressEl.style.width=`${Math.round((i/clients.length)*85)}%`;statusEl.textContent=`Localizando ${i+1} de ${clients.length}: ${c.name}`;let point=(c.latitude!=null&&c.longitude!=null)?{...c,latitude:Number(c.latitude),longitude:Number(c.longitude)}:await geocode(c.address);if(point)located.push({...c,...point});else failed.push(c);if(c.latitude==null||c.longitude==null)await sleep(1100);}if(!located.length)throw new Error('No se pudo localizar ningún cliente');statusEl.textContent='Calculando la secuencia de menor desplazamiento…';const result=twoOpt(nearest(located,start),start,back);const ordered=result.path.concat(failed.map(c=>({...c,latitude:null,longitude:null})));const save=await fetch('/api/routes/save-optimized',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seller,day,clients:ordered})});if(!save.ok)throw new Error('No se pudo guardar el orden');progressEl.style.width='100%';statusEl.textContent=`Ruta guardada: ${clients.length} clientes · distancia geográfica estimada ${result.distance.toFixed(1)} km · ${failed.length} sin localizar.`;previewEl.innerHTML='<h3>Orden guardado</h3><ol>'+ordered.map(c=>`<li><b>${c.name}</b> — ${c.address}${c.latitude==null?' <span class="warning-text">(sin geocodificar)</span>':''}</li>`).join('')+'</ol>';setTimeout(()=>location.href=`/clients?seller=${encodeURIComponent(seller)}&day=${day}&status=active`,1200);}catch(e){statusEl.textContent='Error: '+e.message;progressEl.style.width='0';}finally{document.getElementById('optimizeBtn').disabled=false;}}
+document.getElementById('optimizeBtn').addEventListener('click',optimize);
+</script>
 {% endblock %}
