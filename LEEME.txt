@@ -1,10 +1,10 @@
-RIMEL v2026.07.22.13
+RIMEL v2026.07.22.14
 
-Actualización del mapa de ruta diaria:
-- Pines grandes, visibles y numerados para todos los clientes del día.
-- Al tocar un pin muestra número de parada, código, nombre, dirección, día y vendedor.
-- Incluye botones para navegar y abrir la ficha del cliente.
-- Punto de salida destacado: Sarandí 1700, Shopping Melancia.
-- No incluye base local, no cambia DATABASE_URL y no borra registros.
+Corrección de pines faltantes:
+- geocodificación del lado del servidor, sin depender del navegador del vendedor;
+- guarda las coordenadas en PostgreSQL para no repetir el proceso;
+- usa dos proveedores y varias variantes de dirección;
+- muestra el progreso hasta ubicar todos los clientes localizables;
+- conserva visitas, clientes, quejas e historial.
 
-Subir estos seis archivos directamente a la raíz de GitHub, reemplazando los existentes.
+Subir estos archivos a la raíz de GitHub reemplazando los existentes. No modificar DATABASE_URL.
