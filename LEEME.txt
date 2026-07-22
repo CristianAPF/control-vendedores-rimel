@@ -1,1 +1,11 @@
-Subir estos archivos a la RAIZ de GitHub. No contiene rimel.db. No cambia DATABASE_URL. app.py incluye internamente todas las pantallas y estilos para evitar archivos cruzados.
+RIMEL v12 - rutas diarias precargadas y mapa para vendedores
+
+Sube todos los archivos de este paquete a la raíz del repositorio GitHub y confirma el commit en main.
+No modifica DATABASE_URL ni elimina visitas, clientes, quejas o historial.
+
+Incluye:
+- orden diario precargado por vendedor;
+- inicio en Sarandí 1700, Shopping Melancia;
+- mapa del día con todos los clientes y pines numerados;
+- lista y mapa en el mismo orden de visita;
+- guardado incremental de coordenadas faltantes.
