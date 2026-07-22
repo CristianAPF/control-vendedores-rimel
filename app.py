@@ -35,7 +35,7 @@ ALLOWED_RESULTS = [
     'CLIENTE CERRADO', 'VISITA REPROGRAMADA', 'CLIENTE INACTIVO'
 ]
 DAYS = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO']
-APP_VERSION = '2026.07.22.14'
+APP_VERSION = '2026.07.22.15'
 RIVERA_TZ = ZoneInfo('America/Montevideo')
 
 def utc_now_naive():
@@ -179,18 +179,38 @@ def clean_geocode_address(address):
     return value
 
 
+RIVERA_CENTER = (-30.905, -55.550)
+# Límite amplio de la ciudad de Rivera y su periferia inmediata. Se usa para
+# rechazar resultados de otros departamentos, ciudades o países.
+RIVERA_CITY_BBOX = {
+    'south': -31.050,
+    'north': -30.800,
+    'west': -55.720,
+    'east': -55.380,
+}
+
+
 def geocode_queries(address):
+    """Genera únicamente búsquedas contextualizadas en Rivera, Uruguay."""
     cleaned = clean_geocode_address(address)
-    values = [f'{cleaned}, Rivera, Uruguay']
+    values = [
+        f'{cleaned}, 40000 Rivera, Rivera, Uruguay',
+        f'{cleaned}, Rivera, Uruguay',
+    ]
     parts = re.split(r'(?i)\s+esquina\s+', cleaned, maxsplit=1)
     if len(parts) == 2:
         main, cross = parts[0].strip(' ,'), parts[1].strip(' ,')
-        values.append(f'{main} y {cross}, Rivera, Uruguay')
-        values.append(f'{main}, Rivera, Uruguay')
+        values.extend([
+            f'{main} y {cross}, 40000 Rivera, Rivera, Uruguay',
+            f'{main} esquina {cross}, Rivera, Uruguay',
+            f'{main}, 40000 Rivera, Rivera, Uruguay',
+        ])
     without_notes = re.sub(r'(?i)\b(frente a|bis|local|apto|km)\b.*$', '', cleaned).strip(' ,')
     if without_notes and without_notes.lower() != cleaned.lower():
-        values.append(f'{without_notes}, Rivera, Uruguay')
-    # eliminar duplicados conservando el orden
+        values.extend([
+            f'{without_notes}, 40000 Rivera, Rivera, Uruguay',
+            f'{without_notes}, Rivera, Uruguay',
+        ])
     result=[]
     seen=set()
     for q in values:
@@ -201,37 +221,62 @@ def geocode_queries(address):
 
 
 def coordinate_in_rivera(lat, lon):
-    return -31.35 <= lat <= -30.45 and -56.20 <= lon <= -54.95
+    """Acepta únicamente coordenadas dentro de la ciudad de Rivera."""
+    try:
+        lat=float(lat); lon=float(lon)
+    except (TypeError, ValueError):
+        return False
+    return (RIVERA_CITY_BBOX['south'] <= lat <= RIVERA_CITY_BBOX['north'] and
+            RIVERA_CITY_BBOX['west'] <= lon <= RIVERA_CITY_BBOX['east'])
+
+
+def nominatim_result_is_rivera(item):
+    display=str(item.get('display_name') or '').casefold()
+    address=item.get('address') or {}
+    locality=' '.join(str(address.get(k) or '') for k in ('city','town','municipality','county','state')).casefold()
+    country=(address.get('country_code') or '').casefold()
+    return country in ('uy','ury','') and ('rivera' in display or 'rivera' in locality)
+
+
+def photon_result_is_rivera(feature):
+    props=feature.get('properties') or {}
+    country=' '.join(str(props.get(k) or '') for k in ('country','countrycode')).casefold()
+    locality=' '.join(str(props.get(k) or '') for k in ('city','district','county','state','name')).casefold()
+    country_ok=(not country) or ('uruguay' in country) or ('uy' in country)
+    return country_ok and 'rivera' in locality
 
 
 def geocode_client_server(address):
-    headers={'User-Agent':'RIMEL-Rutas/2026.07.22.14 (operaciones@rimel.uy)','Accept':'application/json'}
+    headers={'User-Agent':'RIMEL-Rutas/2026.07.22.15 (operaciones@rimel.uy)','Accept':'application/json'}
+    viewbox=f"{RIVERA_CITY_BBOX['west']},{RIVERA_CITY_BBOX['north']},{RIVERA_CITY_BBOX['east']},{RIVERA_CITY_BBOX['south']}"
     for query in geocode_queries(address):
-        params=urlencode({'format':'jsonv2','limit':1,'countrycodes':'uy','accept-language':'es','viewbox':'-56.20,-30.45,-54.95,-31.35','bounded':1,'q':query})
+        params=urlencode({
+            'format':'jsonv2','limit':3,'countrycodes':'uy','accept-language':'es',
+            'addressdetails':1,'viewbox':viewbox,'bounded':1,'q':query
+        })
         try:
             req=Request('https://nominatim.openstreetmap.org/search?'+params,headers=headers)
             with urlopen(req, timeout=12) as response:
                 data=json.loads(response.read().decode('utf-8'))
-            if data:
-                lat=float(data[0]['lat']); lon=float(data[0]['lon'])
-                if coordinate_in_rivera(lat,lon):
-                    return lat,lon,'Nominatim'
+            for item in data:
+                lat=float(item['lat']); lon=float(item['lon'])
+                if coordinate_in_rivera(lat,lon) and nominatim_result_is_rivera(item):
+                    return lat,lon,'Nominatim-Rivera'
         except Exception:
             pass
         time.sleep(1.05)
-    # Segundo proveedor para direcciones que Nominatim no reconoce.
+    # Segundo proveedor, también centrado y validado exclusivamente en Rivera.
     for query in geocode_queries(address):
-        params=urlencode({'q':query,'limit':1,'lang':'es','lat':-30.905,'lon':-55.55})
+        params=urlencode({'q':query,'limit':5,'lang':'es','lat':RIVERA_CENTER[0],'lon':RIVERA_CENTER[1]})
         try:
             req=Request('https://photon.komoot.io/api/?'+params,headers=headers)
             with urlopen(req, timeout=12) as response:
                 data=json.loads(response.read().decode('utf-8'))
-            features=data.get('features') or []
-            if features:
-                lon,lat=features[0]['geometry']['coordinates'][:2]
+            for feature in data.get('features') or []:
+                lon,lat=feature['geometry']['coordinates'][:2]
                 lat=float(lat); lon=float(lon)
-                if coordinate_in_rivera(lat,lon):
-                    return lat,lon,'Photon'
+                if coordinate_in_rivera(lat,lon) and photon_result_is_rivera(feature):
+                    return lat,lon,'Photon-Rivera'
         except Exception:
             pass
     return None
@@ -726,6 +771,11 @@ def daily_route_map_api():
         batch=max(1,min(int(request.args.get('batch','6')),10))
     except (TypeError,ValueError):
         batch=6
+    invalid=[c for c in rows if c.latitude is not None and c.longitude is not None and not coordinate_in_rivera(c.latitude,c.longitude)]
+    for c in invalid:
+        c.latitude=None; c.longitude=None
+    if invalid:
+        db.session.commit()
     missing=[c for c in rows if c.latitude is None or c.longitude is None]
     processed=0
     for c in missing[:batch]:

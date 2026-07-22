@@ -1,10 +1,11 @@
-RIMEL v2026.07.22.14
+RIMEL v2026.07.22.15
 
-Corrección de pines faltantes:
-- geocodificación del lado del servidor, sin depender del navegador del vendedor;
-- guarda las coordenadas en PostgreSQL para no repetir el proceso;
-- usa dos proveedores y varias variantes de dirección;
-- muestra el progreso hasta ubicar todos los clientes localizables;
+Geocodificación obligatoria en la ciudad de Rivera:
+- todas las direcciones se consultan como 40000 Rivera, Rivera, Uruguay;
+- se restringe la búsqueda al área urbana de Rivera;
+- se descartan resultados de otras ciudades, departamentos o países;
+- se vuelven a localizar coordenadas antiguas que estén fuera de Rivera;
+- las coordenadas válidas quedan guardadas en PostgreSQL;
 - conserva visitas, clientes, quejas e historial.
 
 Subir estos archivos a la raíz de GitHub reemplazando los existentes. No modificar DATABASE_URL.
