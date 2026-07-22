@@ -1,11 +1,10 @@
-RIMEL v12 - rutas diarias precargadas y mapa para vendedores
+RIMEL v2026.07.22.13
 
-Sube todos los archivos de este paquete a la raíz del repositorio GitHub y confirma el commit en main.
-No modifica DATABASE_URL ni elimina visitas, clientes, quejas o historial.
+Actualización del mapa de ruta diaria:
+- Pines grandes, visibles y numerados para todos los clientes del día.
+- Al tocar un pin muestra número de parada, código, nombre, dirección, día y vendedor.
+- Incluye botones para navegar y abrir la ficha del cliente.
+- Punto de salida destacado: Sarandí 1700, Shopping Melancia.
+- No incluye base local, no cambia DATABASE_URL y no borra registros.
 
-Incluye:
-- orden diario precargado por vendedor;
-- inicio en Sarandí 1700, Shopping Melancia;
-- mapa del día con todos los clientes y pines numerados;
-- lista y mapa en el mismo orden de visita;
-- guardado incremental de coordenadas faltantes.
+Subir estos seis archivos directamente a la raíz de GitHub, reemplazando los existentes.
