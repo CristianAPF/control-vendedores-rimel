@@ -1,12 +1,10 @@
-RIMEL v2026.07.22.16
+RIMEL v2026.07.22.17
 
-COLORES DE PINES SEGÚN LA VISITA DEL DÍA (hora Rivera)
-- Azul: todavía no visitado.
-- Verde: PEDIDO CONCRETADO o SIN NECESIDAD DE REPOSICION.
-- Amarillo: CLIENTE AUSENTE, CLIENTE CERRADO o VISITA REPROGRAMADA.
-- Gris: CLIENTE INACTIVO.
-- El popup muestra el resultado y la hora registrada.
-- Si hay más de una visita en el día, se usa el último resultado.
+Colores diarios corregidos:
+- Verde: pedido concretado.
+- Rojo: sin necesidad de reposición.
+- Amarillo: ausente, cerrado o reprogramado.
+- Azul: no visitado hoy.
+- Gris: inactivo.
 
-No incluye la base de datos, no cambia DATABASE_URL y no elimina registros.
-Subir los seis archivos directamente a la raíz de GitHub.
+Se usa únicamente la última visita del día actual de Rivera (America/Montevideo). Al comenzar un nuevo día, los pines vuelven al color normal hasta registrar una visita. No borra datos.
