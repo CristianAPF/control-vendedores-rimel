@@ -1,10 +1,11 @@
-RIMEL v2026.07.22.18
+RIMEL v2026.07.22.19
 
-La lista del vendedor ahora usa los mismos colores diarios del mapa:
-- Verde: pedido concretado.
-- Rojo: sin necesidad de reposición.
-- Amarillo: ausente, cerrado o reprogramado.
-- Azul: no visitado hoy.
-- Gris: inactivo.
+Novedad: Dashboard gerencial detallado, exclusivo para el perfil gerente.
+- Clientes visitados y no visitados.
+- Compraron, sin reposición, ausentes, cerrados, reprogramados, inactivos y otros.
+- Cobertura y detalle por vendedor.
+- Actividad diaria.
+- Tabla pormenorizada de cada cliente y última visita del período.
+- Exportación completa a Excel con hojas Resumen, Detalle clientes, Por vendedor y Actividad diaria.
 
-Los colores consideran solo la última visita registrada durante el día actual en Rivera.
+Subir los seis archivos a la raíz de GitHub. No modificar DATABASE_URL.
