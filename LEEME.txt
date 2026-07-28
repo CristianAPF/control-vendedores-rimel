@@ -1,10 +1,10 @@
-RIMEL v2026.07.22.17
+RIMEL v2026.07.22.18
 
-Colores diarios corregidos:
+La lista del vendedor ahora usa los mismos colores diarios del mapa:
 - Verde: pedido concretado.
 - Rojo: sin necesidad de reposición.
 - Amarillo: ausente, cerrado o reprogramado.
 - Azul: no visitado hoy.
 - Gris: inactivo.
 
-Se usa únicamente la última visita del día actual de Rivera (America/Montevideo). Al comenzar un nuevo día, los pines vuelven al color normal hasta registrar una visita. No borra datos.
+Los colores consideran solo la última visita registrada durante el día actual en Rivera.
