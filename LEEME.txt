@@ -1,11 +1,11 @@
-RIMEL v2026.07.22.19
+RIMEL v2026.07.22.20
 
-Novedad: Dashboard gerencial detallado, exclusivo para el perfil gerente.
-- Clientes visitados y no visitados.
-- Compraron, sin reposición, ausentes, cerrados, reprogramados, inactivos y otros.
-- Cobertura y detalle por vendedor.
-- Actividad diaria.
-- Tabla pormenorizada de cada cliente y última visita del período.
-- Exportación completa a Excel con hojas Resumen, Detalle clientes, Por vendedor y Actividad diaria.
+Mejora visual de estados:
+- Amarillo reemplazado por ámbar oscuro, legible sobre fondo crema.
+- Filas con fondo suave y borde lateral del color correspondiente.
+- Verde, rojo, azul y gris con mayor contraste.
+- Leyenda con etiquetas profesionales.
+- Estados del dashboard gerencial mostrados como etiquetas de alto contraste.
+- No se modifica la lógica diaria ni los registros de la base.
 
-Subir los seis archivos a la raíz de GitHub. No modificar DATABASE_URL.
+Subir los seis archivos a la raíz de GitHub y mantener DATABASE_URL sin cambios.
