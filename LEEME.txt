@@ -1,11 +1,10 @@
-RIMEL v2026.07.22.20
+RIMEL v2026.08.12.21
 
-Mejora visual de estados:
-- Amarillo reemplazado por ámbar oscuro, legible sobre fondo crema.
-- Filas con fondo suave y borde lateral del color correspondiente.
-- Verde, rojo, azul y gris con mayor contraste.
-- Leyenda con etiquetas profesionales.
-- Estados del dashboard gerencial mostrados como etiquetas de alto contraste.
-- No se modifica la lógica diaria ni los registros de la base.
+Novedad para perfil vendedor:
+- Búsqueda rápida de clientes por nombre, dirección o código.
+- Busca en toda la cartera del vendedor, aunque el cliente corresponda a otro día.
+- Desde el resultado se puede abrir el mapa o registrar la visita directamente.
+- No altera la ruta diaria ni el orden optimizado.
+- Mantiene colores diarios, dashboard gerencial y exportaciones Excel.
 
-Subir los seis archivos a la raíz de GitHub y mantener DATABASE_URL sin cambios.
+Subir los seis archivos a la raíz de GitHub. No modificar DATABASE_URL.
