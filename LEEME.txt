@@ -1,10 +1,9 @@
-RIMEL v2026.11.13.27
+RIMEL v2026.11.13.28
 
-Corrección de seguridad geográfica del mapa:
-- Se eliminan completamente los pines aproximados/inventados.
-- Solo se muestran pines con coordenadas verificadas dentro de Rivera, Uruguay.
-- Se exige pertenencia a Rivera y una distancia máxima de 8 km desde Shopping Melancia.
-- Coordenadas fuera de Rivera se descartan y se vuelven a localizar.
-- Las direcciones todavía no verificadas se informan como pendientes, no se colocan en un lugar falso.
-- Se conservan colores diarios y orden de ruta.
-- No se borran visitas, clientes, quejas ni historial.
+Corrección fuerte del mapa:
+- Limpia de PostgreSQL toda coordenada fuera de Rivera al iniciar.
+- El navegador valida latitud/longitud antes de dibujar cada pin.
+- Se elimina la caché del service worker y se fuerza no-cache/no-store.
+- No se muestran pines fuera de Rivera ni a más de 8 km de Shopping Melancia.
+- No se inventan coordenadas.
+- Se conservan visitas, clientes, rutas, quejas e historial.
