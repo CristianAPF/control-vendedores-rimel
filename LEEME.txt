@@ -1,10 +1,10 @@
-RIMEL v2026.11.13.25
+RIMEL v2026.11.13.26
 
-Corrección: todos los clientes de la ruta diaria tienen pin visible.
-- Se recuperan coordenadas exactas adicionales desde el archivo original.
-- Si una coordenada exacta todavía no está disponible, se muestra una ubicación aproximada solo para visualizar el cliente.
-- Las ubicaciones aproximadas NO se guardan en PostgreSQL como si fueran exactas.
-- Pines aproximados mantienen el color del estado y llevan el símbolo ≈.
-- El sistema continúa intentando obtener la coordenada real en Rivera y la reemplaza automáticamente cuando la consigue.
-- Mantiene ruta optimizada y las reglas de color: azul no visitado, verde pedido, rojo sin reposición, ámbar ausente/cerrado/reprogramado, gris inactivo.
-- No borra visitas, clientes, quejas ni historial.
+Corrección crítica de pines faltantes:
+- Se corrige la dependencia interna usada para generar coordenadas aproximadas de visualización.
+- El endpoint del mapa devuelve una coordenada de visualización para cada cliente activo de la ruta.
+- Un cliente con datos problemáticos ya no impide dibujar los demás pines.
+- Se mantienen ubicaciones exactas cuando existen y aproximadas (≈) cuando todavía no existen.
+- Se mantienen los colores diarios: azul no visitado, verde pedido, rojo sin reposición, ámbar ausente/cerrado/reprogramado y gris inactivo.
+- Se mantiene la ruta optimizada y el origen en Sarandí 1700 · Shopping Melancia.
+- No se borran visitas, clientes, quejas ni historial.
