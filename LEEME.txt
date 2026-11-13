@@ -1,10 +1,13 @@
-RIMEL v2026.11.13.23
+RIMEL v2026.11.13.24
 
-Corrección de despliegue en Render:
-- Se agrega psycopg[binary] porque DATABASE_URL está usando el driver postgresql+psycopg.
-- Se conserva psycopg2-binary por compatibilidad.
-- No modifica DATABASE_URL.
-- No modifica ni elimina datos de PostgreSQL.
-- Mantiene todas las rutas de la versión V22.
-
-Subir los seis archivos a GitHub y dejar que Render haga Auto-Deploy.
+Corrección del mapa con nuevas rutas:
+- Mantiene las 1.182 rutas/clientes de la actualización.
+- Reoptimiza el orden por proximidad desde Sarandí 1700 para clientes con coordenadas.
+- Inserta clientes sin coordenadas junto a clientes de la misma calle cuando es posible.
+- Reutiliza coordenadas ya guardadas para direcciones iguales.
+- Geocodificación progresiva rápida y restringida a Rivera, Uruguay.
+- Pines más grandes, numerados y visibles.
+- Ruta visible en el mapa siguiendo el orden optimizado.
+- Colores diarios conservados: azul no visitado, verde pedido, rojo sin reposición, ámbar ausente/cerrado/reprogramado, gris inactivo.
+- No borra visitas, quejas ni historial.
+- Incluye psycopg[binary] para Render.
