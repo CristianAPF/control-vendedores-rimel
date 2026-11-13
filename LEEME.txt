@@ -1,13 +1,10 @@
-RIMEL v2026.11.13.22
+RIMEL v2026.11.13.23
 
-Actualización de rutas basada en Rutas_def_actualizado_con_clientes_agregados.xlsx.
-- 1.182 registros de ruta incorporados.
-- Actualiza vendedor, día, orden, nombre y dirección según el documento maestro.
-- Agrega clientes que no existían.
-- Los clientes que ya no están en el documento se dejan inactivos, no se borran.
-- Se preservan visitas, quejas e historial existentes.
-- La sincronización es idempotente: reiniciar Render no duplica las rutas.
-- Para códigos vacíos se usa una identificación interna estable, sin depender solo del código para conciliar.
-- Las coordenadas existentes se conservan si el Excel no tiene latitud/longitud.
+Corrección de despliegue en Render:
+- Se agrega psycopg[binary] porque DATABASE_URL está usando el driver postgresql+psycopg.
+- Se conserva psycopg2-binary por compatibilidad.
+- No modifica DATABASE_URL.
+- No modifica ni elimina datos de PostgreSQL.
+- Mantiene todas las rutas de la versión V22.
 
-Subir los seis archivos a la raíz de GitHub. No modificar DATABASE_URL.
+Subir los seis archivos a GitHub y dejar que Render haga Auto-Deploy.
