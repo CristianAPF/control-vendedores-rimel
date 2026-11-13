@@ -1,4 +1,4 @@
-import json, os, secrets, time, re
+import json, os, secrets, time, re, unicodedata
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from datetime import datetime, date, timedelta, timezone
@@ -28,7 +28,7 @@ EMBEDDED_TEMPLATES = {'base.html': '<!doctype html><html lang="es"><head><meta c
 app.jinja_loader = DictLoader(EMBEDDED_TEMPLATES)
 ALLOWED_RESULTS = ['PEDIDO CONCRETADO', 'SIN NECESIDAD DE REPOSICION', 'CLIENTE AUSENTE', 'CLIENTE CERRADO', 'VISITA REPROGRAMADA', 'CLIENTE INACTIVO']
 DAYS = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO']
-APP_VERSION = '2026.08.12.21'
+APP_VERSION = '2026.11.13.22'
 RIVERA_TZ = ZoneInfo('America/Montevideo')
 
 def utc_now_naive():
@@ -86,6 +86,7 @@ class User(db.Model):
 
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    route_uid = db.Column(db.String(64), nullable=True, index=True)
     code = db.Column(db.String(30), nullable=False, index=True)
     name = db.Column(db.String(200), nullable=False)
     address = db.Column(db.String(300), nullable=False)
@@ -275,6 +276,8 @@ def ensure_schema_updates():
         return
     statements = []
     client_columns = {c['name'] for c in inspector.get_columns('client')}
+    if 'route_uid' not in client_columns:
+        statements.append('ALTER TABLE client ADD COLUMN route_uid VARCHAR(64)')
     if 'latitude' not in client_columns:
         statements.append('ALTER TABLE client ADD COLUMN latitude FLOAT')
     if 'longitude' not in client_columns:
@@ -305,24 +308,140 @@ def next_route_order(seller, day):
     current = db.session.query(db.func.max(db.func.coalesce(Client.optimized_order, Client.original_order))).filter(Client.seller == seller, Client.day == day).scalar() or 0
     return int(current) + 1
 
-def apply_embedded_route_orders():
-    """Aplica el orden diario precargado sin eliminar clientes, visitas ni historial."""
+def normalize_route_text(value):
+    text_value = unicodedata.normalize('NFKD', str(value or '').strip().upper())
+    text_value = ''.join(ch for ch in text_value if not unicodedata.combining(ch))
+    text_value = re.sub(r'\s+', ' ', text_value)
+    return text_value.strip()
+
+def load_embedded_routes():
     try:
         with open(BASE / 'routes_embedded.json', encoding='utf-8') as f:
-            rows = json.load(f).get('routes', [])
+            return json.load(f).get('routes', [])
     except Exception:
+        return []
+
+def sync_embedded_routes():
+    """Sincroniza las rutas maestras sin borrar visitas, quejas ni historial."""
+    rows = load_embedded_routes()
+    if not rows:
         return
-    by_code = {str(r.get('provisional_code', '')).strip().upper(): r for r in rows}
-    by_key = {(str(r.get('seller', '')).strip().title(), normalize_day(r.get('day')), str(r.get('name', '')).strip().upper(), str(r.get('address', '')).strip().upper()): r for r in rows}
+
+    existing = Client.query.order_by(Client.id).all()
+    used_ids = set()
+
+    by_uid = {}
+    by_name_addr = {}
+    by_code = {}
+    for c in existing:
+        if c.route_uid:
+            by_uid.setdefault(str(c.route_uid), []).append(c)
+        key_na = (normalize_route_text(c.name), normalize_route_text(c.address))
+        by_name_addr.setdefault(key_na, []).append(c)
+        code_key = normalize_route_text(c.code)
+        if code_key:
+            by_code.setdefault(code_key, []).append(c)
+
+    embedded_code_counts = {}
+    for r in rows:
+        code_key = normalize_route_text(r.get('source_code') or r.get('provisional_code'))
+        if code_key:
+            embedded_code_counts[code_key] = embedded_code_counts.get(code_key, 0) + 1
+
     changed = 0
-    for c in Client.query.all():
-        r = by_code.get(str(c.code or '').strip().upper()) or by_key.get((str(c.seller or '').strip().title(), normalize_day(c.day), str(c.name or '').strip().upper(), str(c.address or '').strip().upper()))
-        if not r:
-            continue
-        order = int(r.get('approved_order') or 0)
-        if order and c.optimized_order != order:
-            c.optimized_order = order
+    created = 0
+
+    def first_unused(candidates):
+        for candidate in candidates or []:
+            if candidate.id not in used_ids:
+                return candidate
+        return None
+
+    for r in rows:
+        route_uid = str(r.get('route_uid') or '').strip()
+        source_code = str(r.get('source_code') or '').strip()
+        provisional_code = str(r.get('provisional_code') or '').strip()
+        target_code = source_code or provisional_code
+        target_name = str(r.get('name') or '').strip()
+        target_address = str(r.get('address') or '').strip()
+        target_seller = str(r.get('seller') or '').strip().title()
+        target_day = normalize_day(r.get('day'))
+        try:
+            target_order = int(r.get('approved_order') or 0)
+        except Exception:
+            target_order = 0
+
+        c = None
+
+        # 1. Identificador persistente de esta fila de ruta.
+        if route_uid:
+            c = first_unused(by_uid.get(route_uid))
+
+        # 2. Nombre + dirección exactos normalizados (principalmente dirección).
+        if not c:
+            key_na = (normalize_route_text(target_name), normalize_route_text(target_address))
+            c = first_unused(by_name_addr.get(key_na))
+
+        # 3. Código solo cuando es único en la nueva fuente.
+        code_key = normalize_route_text(target_code)
+        if not c and code_key and embedded_code_counts.get(code_key) == 1:
+            c = first_unused(by_code.get(code_key))
+
+        if not c:
+            c = Client(
+                route_uid=route_uid or None,
+                code=target_code or next_client_code(),
+                name=target_name,
+                address=target_address,
+                seller=target_seller,
+                day=target_day,
+                original_order=target_order,
+                optimized_order=target_order,
+                latitude=r.get('latitude'),
+                longitude=r.get('longitude'),
+                active=True,
+            )
+            db.session.add(c)
+            db.session.flush()
+            existing.append(c)
+            created += 1
             changed += 1
+        else:
+            updates = {
+                'route_uid': route_uid or c.route_uid,
+                'name': target_name,
+                'address': target_address,
+                'seller': target_seller,
+                'day': target_day,
+                'original_order': target_order,
+                'optimized_order': target_order,
+                'active': True,
+            }
+            # Si el Excel no tenía código, conservamos un código existente válido.
+            if source_code:
+                updates['code'] = source_code
+            elif not str(c.code or '').strip():
+                updates['code'] = provisional_code or next_client_code()
+
+            # No borrar una coordenada ya geocodificada si el Excel la deja vacía.
+            if r.get('latitude') is not None and r.get('longitude') is not None:
+                updates['latitude'] = r.get('latitude')
+                updates['longitude'] = r.get('longitude')
+
+            for field, value in updates.items():
+                if getattr(c, field) != value:
+                    setattr(c, field, value)
+                    changed += 1
+
+        used_ids.add(c.id)
+
+    # Clientes que ya no figuran en el documento dejan de aparecer en rutas,
+    # pero permanecen en la base para conservar todas sus visitas históricas.
+    for c in existing:
+        if c.id not in used_ids and c.active:
+            c.active = False
+            changed += 1
+
     if changed:
         db.session.commit()
 
@@ -331,7 +450,19 @@ def seed_data():
         with open(BASE / 'routes_embedded.json', encoding='utf-8') as f:
             data = json.load(f)
         for r in data['routes']:
-            db.session.add(Client(code=r['provisional_code'], name=r['name'], address=r['address'], seller=r['seller'].title(), day=normalize_day(r['day']), original_order=r.get('approved_order') or 0, optimized_order=r.get('approved_order') or 0))
+            db.session.add(Client(
+                route_uid=r.get('route_uid'),
+                code=(r.get('source_code') or r.get('provisional_code') or next_client_code()),
+                name=r['name'],
+                address=r['address'],
+                seller=r['seller'].title(),
+                day=normalize_day(r['day']),
+                original_order=r.get('approved_order') or 0,
+                optimized_order=r.get('approved_order') or 0,
+                latitude=r.get('latitude'),
+                longitude=r.get('longitude'),
+                active=True
+            ))
     if User.query.count() == 0:
         defaults = [('gerencia', 'Gerencia RIMEL', 'manager', None, 'Rimel2026!'), ('gerson', 'Gerson', 'seller', 'Gerson', 'Gerson2026!'), ('eduardo', 'Eduardo', 'seller', 'Eduardo', 'Eduardo2026!'), ('victoria', 'Victoria', 'seller', 'Victoria', 'Victoria2026!')]
         for username, full, role, seller, pw in defaults:
@@ -344,7 +475,7 @@ def ensure_db():
         db.create_all()
         ensure_schema_updates()
         seed_data()
-        apply_embedded_route_orders()
+        sync_embedded_routes()
         app._initialized = True
 
 @app.get('/health')
@@ -1216,4 +1347,5 @@ if __name__ == '__main__':
         db.create_all()
         ensure_schema_updates()
         seed_data()
+        sync_embedded_routes()
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=False, use_reloader=False)

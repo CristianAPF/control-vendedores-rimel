@@ -1,10 +1,13 @@
-RIMEL v2026.08.12.21
+RIMEL v2026.11.13.22
 
-Novedad para perfil vendedor:
-- Búsqueda rápida de clientes por nombre, dirección o código.
-- Busca en toda la cartera del vendedor, aunque el cliente corresponda a otro día.
-- Desde el resultado se puede abrir el mapa o registrar la visita directamente.
-- No altera la ruta diaria ni el orden optimizado.
-- Mantiene colores diarios, dashboard gerencial y exportaciones Excel.
+Actualización de rutas basada en Rutas_def_actualizado_con_clientes_agregados.xlsx.
+- 1.182 registros de ruta incorporados.
+- Actualiza vendedor, día, orden, nombre y dirección según el documento maestro.
+- Agrega clientes que no existían.
+- Los clientes que ya no están en el documento se dejan inactivos, no se borran.
+- Se preservan visitas, quejas e historial existentes.
+- La sincronización es idempotente: reiniciar Render no duplica las rutas.
+- Para códigos vacíos se usa una identificación interna estable, sin depender solo del código para conciliar.
+- Las coordenadas existentes se conservan si el Excel no tiene latitud/longitud.
 
 Subir los seis archivos a la raíz de GitHub. No modificar DATABASE_URL.
