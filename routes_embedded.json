@@ -20113,5 +20113,11 @@
   "coordinate_recovery": {
     "recovered_from_original_routes": 31,
     "fallback_policy": "missing coordinates are displayed approximately at runtime and are never persisted as exact coordinates"
+  },
+  "geographic_validation": {
+    "policy": "Only verified coordinates inside Rivera, Uruguay are stored/displayed",
+    "max_distance_km_from_shopping_melancia": 8.0,
+    "verified_embedded": 317,
+    "removed_as_invalid": 0
   }
 }
