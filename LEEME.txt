@@ -1,9 +1,9 @@
-RIMEL v2026.11.13.28
+RIMEL v2026.11.13.29
 
-Corrección fuerte del mapa:
-- Limpia de PostgreSQL toda coordenada fuera de Rivera al iniciar.
-- El navegador valida latitud/longitud antes de dibujar cada pin.
-- Se elimina la caché del service worker y se fuerza no-cache/no-store.
-- No se muestran pines fuera de Rivera ni a más de 8 km de Shopping Melancia.
+Corrección integral de pines en Rivera.
+- CUARO = AVENIDA 1825.
+- ArcGIS + Photon + Nominatim, todos restringidos a Rivera, Uruguay.
+- No se aceptan coordenadas fuera de Rivera.
 - No se inventan coordenadas.
-- Se conservan visitas, clientes, rutas, quejas e historial.
+- 'Sin direccion' se completa solo si existe una coincidencia inequívoca del mismo cliente en la misma ruta.
+- El mapa continúa geocodificando hasta completar la ruta.
