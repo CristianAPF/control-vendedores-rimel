@@ -1,13 +1,10 @@
-RIMEL v2026.11.13.24
+RIMEL v2026.11.13.25
 
-Corrección del mapa con nuevas rutas:
-- Mantiene las 1.182 rutas/clientes de la actualización.
-- Reoptimiza el orden por proximidad desde Sarandí 1700 para clientes con coordenadas.
-- Inserta clientes sin coordenadas junto a clientes de la misma calle cuando es posible.
-- Reutiliza coordenadas ya guardadas para direcciones iguales.
-- Geocodificación progresiva rápida y restringida a Rivera, Uruguay.
-- Pines más grandes, numerados y visibles.
-- Ruta visible en el mapa siguiendo el orden optimizado.
-- Colores diarios conservados: azul no visitado, verde pedido, rojo sin reposición, ámbar ausente/cerrado/reprogramado, gris inactivo.
-- No borra visitas, quejas ni historial.
-- Incluye psycopg[binary] para Render.
+Corrección: todos los clientes de la ruta diaria tienen pin visible.
+- Se recuperan coordenadas exactas adicionales desde el archivo original.
+- Si una coordenada exacta todavía no está disponible, se muestra una ubicación aproximada solo para visualizar el cliente.
+- Las ubicaciones aproximadas NO se guardan en PostgreSQL como si fueran exactas.
+- Pines aproximados mantienen el color del estado y llevan el símbolo ≈.
+- El sistema continúa intentando obtener la coordenada real en Rivera y la reemplaza automáticamente cuando la consigue.
+- Mantiene ruta optimizada y las reglas de color: azul no visitado, verde pedido, rojo sin reposición, ámbar ausente/cerrado/reprogramado, gris inactivo.
+- No borra visitas, clientes, quejas ni historial.
